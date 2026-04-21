@@ -36,7 +36,7 @@ if submitted:
         "EstimatedSalary": estimated_salary,
     }
     try:
-        response = requests.post(f"{API_URL}/predict", json=payload, timeout=10)
+        response = requests.post(f"{API_URL}/predict", json=payload, timeout=5)
         response.raise_for_status()
         data = response.json()
         st.success(f"Prediction: {data['label']}")

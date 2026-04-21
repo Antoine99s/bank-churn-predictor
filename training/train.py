@@ -71,10 +71,12 @@ def main() -> None:
     if target_col not in df.columns:
         raise ValueError(f"Expected target column '{target_col}' in dataset")
 
-    X = df.drop(columns=[target_col], errors="ignore").copy()
+    X = df.drop(columns=[target_col]).copy()
     y = df[target_col]
 
-    X = X.drop(columns=["CustomerId", "Surname"], errors="ignore")
+    id_columns = [col for col in ("CustomerId", "Surname") if col in X.columns]
+    if id_columns:
+        X = X.drop(columns=id_columns)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -91,10 +93,9 @@ def main() -> None:
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Accuracy: {accuracy:.4f}")
 
-    if hasattr(pipeline, "predict_proba"):
-        y_proba = pipeline.predict_proba(X_test)[:, 1]
-        roc_auc = roc_auc_score(y_test, y_proba)
-        print(f"ROC AUC: {roc_auc:.4f}")
+    y_proba = pipeline.predict_proba(X_test)[:, 1]
+    roc_auc = roc_auc_score(y_test, y_proba)
+    print(f"ROC AUC: {roc_auc:.4f}")
 
     MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipeline, MODEL_PATH)

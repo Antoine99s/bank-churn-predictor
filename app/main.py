@@ -14,6 +14,7 @@ app = FastAPI(title="Bank Churn Predictor")
 BASE_DIR = Path(__file__).resolve().parents[1]
 MODEL_PATH = BASE_DIR / "app" / "model.pkl"
 _model: Any | None = None
+PREDICTION_THRESHOLD = 0.5
 
 
 def get_model() -> Any:
@@ -42,8 +43,8 @@ def predict(payload: PredictionRequest) -> PredictionResponse:
     features = pd.DataFrame([payload.model_dump()])
 
     try:
-        prediction = int(model.predict(features)[0])
         probability = float(model.predict_proba(features)[0][1])
+        prediction = int(probability >= PREDICTION_THRESHOLD)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Prediction failed: {exc}") from exc
 
