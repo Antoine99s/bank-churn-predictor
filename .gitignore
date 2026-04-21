@@ -1,0 +1,6 @@
+# Python cache/build artifacts
+__pycache__/
+*.pyc
+
+# Generated model artifact
+app/model.pkl
